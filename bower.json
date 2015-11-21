@@ -15,7 +15,7 @@
     "purescript-foreign": "0.7.1",
     "purescript-smolder": "3.0.1",
     "purescript-generics": "0.7.0",
-    "purescript-foreign-generic": "0.2.0"
+    "purescript-foreign-generic": "0.3.0"
   },
   "resolutions": {
     "purescript-strings": "^0.7.0",

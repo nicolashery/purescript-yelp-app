@@ -2,21 +2,26 @@ module App.Model
   ( BusinessId()
   , Business(..)
   , SearchResponse(..)
+  , toForeignBusinesses
   ) where
 
 import Prelude
 
-import Data.Generic (Generic, gShow)
-import Data.Foreign.Class (IsForeign, readProp)
+import Data.Foreign (Foreign())
+import Data.Foreign.Class (IsForeign)
 import Data.Foreign.Generic
   ( Options()
   , defaultOptions
   , readGeneric
+  , toForeignGeneric
   )
+import Data.Generic (Generic, gShow)
+import Data.Maybe (Maybe())
+import Data.Tuple (Tuple())
 
 
 opts :: Options
-opts = defaultOptions { unwrapNewtypes = true }
+opts = defaultOptions { unwrapNewtypes = true, tupleAsArray = true }
 
 -- Types
 -------------------------------------------------------------------------------
@@ -25,12 +30,19 @@ type BusinessId = String
 
 newtype Business = Business {
   id :: BusinessId,
-  name :: String
+  name :: String,
+  categories :: Maybe (Array (Tuple String String))
 }
 
 newtype SearchResponse = SearchResponse {
   businesses :: Array Business
 }
+
+-- Functions
+-------------------------------------------------------------------------------
+
+toForeignBusinesses :: Array Business -> Foreign
+toForeignBusinesses businesses = toForeignGeneric opts businesses
 
 -- Instances
 -------------------------------------------------------------------------------
