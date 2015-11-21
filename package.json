@@ -1,0 +1,25 @@
+{
+  "name": "purescript-yelp-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicolashery/purescript-yelp-app.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "1.14.1",
+    "express": "4.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "1.8.1"
+  }
+}
