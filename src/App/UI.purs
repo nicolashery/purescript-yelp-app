@@ -3,12 +3,12 @@ module App.UI where
 import Prelude
 
 import Data.Foldable (traverse_)
-import Text.Smolder.HTML as H
-import Text.Smolder.HTML.Attributes as A
+import qualified Text.Smolder.HTML as H
+import qualified Text.Smolder.HTML.Attributes as A
 import Text.Smolder.Markup (Markup(), text, (!))
 import Text.Smolder.Renderer.String (render)
 
-import App.Model (Business(..))
+import App.Model (ApiError(..), Business(..))
 
 renderPageToString :: Markup -> String
 renderPageToString content =
@@ -22,9 +22,18 @@ renderPageToString content =
           H.link ! A.rel "stylesheet" ! A.href "https://cdnjs.cloudflare.com/ajax/libs/foundation/6.0.1/css/foundation.min.css"
           H.link ! A.rel "stylesheet" ! A.href "style.css"
         H.body $ do
-          H.img ! A.className "powered-by-yelp" ! A.src "powered-by-yelp.png"
+          renderPoweredByYelp
           content
   in render markup
+
+renderPoweredByYelp :: Markup
+renderPoweredByYelp = H.img ! A.className "powered-by-yelp" ! A.src "powered-by-yelp.png"
+
+renderApiError :: ApiError -> Markup
+renderApiError (ApiError { name = name, message = message }) =
+  H.div ! A.className "alert callout" $ do
+    H.p $ text "Oops! Something went wrong."
+    H.p $ text ("(" ++ name ++ ") " ++ message)
 
 renderBusinesses :: Array Business -> Markup
 renderBusinesses businesses =
@@ -33,6 +42,3 @@ renderBusinesses businesses =
 renderBusiness :: Business -> Markup
 renderBusiness (Business { name = name }) =
   H.li ! A.className "business" $ text name
-
-renderBusinessesToString :: Array Business -> String
-renderBusinessesToString businesses = render (renderBusinesses businesses)

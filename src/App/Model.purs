@@ -1,9 +1,4 @@
-module App.Model
-  ( BusinessId()
-  , Business(..)
-  , SearchResponse(..)
-  , toForeignBusinesses
-  ) where
+module App.Model where
 
 import Prelude
 
@@ -34,6 +29,15 @@ newtype Business = Business {
   categories :: Maybe (Array (Tuple String String))
 }
 
+newtype ApiError = ApiError {
+  name :: String,
+  message :: String
+}
+
+newtype ErrorResponse = ErrorResponse {
+  error :: ApiError
+}
+
 newtype SearchResponse = SearchResponse {
   businesses :: Array Business
 }
@@ -47,6 +51,8 @@ toForeignBusinesses businesses = toForeignGeneric opts businesses
 -- Instances
 -------------------------------------------------------------------------------
 
+-- Business
+
 derive instance genericBusiness :: Generic Business
 
 instance showBusiness :: Show Business where
@@ -54,6 +60,28 @@ instance showBusiness :: Show Business where
 
 instance businessIsForeign :: IsForeign Business where
   read = readGeneric defaultOptions
+
+-- ApiError
+
+derive instance genericApiError :: Generic ApiError
+
+instance showApiError :: Show ApiError where
+  show = gShow
+
+instance apiErrorIsForeign :: IsForeign ApiError where
+  read = readGeneric opts
+
+-- ErrorResponse
+
+derive instance genericErrorResponse :: Generic ErrorResponse
+
+instance showErrorResponse :: Show ErrorResponse where
+  show = gShow
+
+instance errorResponseIsForeign :: IsForeign ErrorResponse where
+  read = readGeneric opts
+
+-- SearchResponse
 
 derive instance genericSearchResponse :: Generic SearchResponse
 

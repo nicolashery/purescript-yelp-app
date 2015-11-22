@@ -3,12 +3,12 @@ module App where
 
 import Prelude
 
-import Data.Either
+import Data.Either (Either(..))
 import Data.Foreign (Foreign(), ForeignError(), toForeign)
 import Data.Foreign.Class (read)
 
-import App.Model (SearchResponse(..), toForeignBusinesses)
-import App.UI (renderPageToString, renderBusinesses)
+import App.Model (ErrorResponse(..), SearchResponse(..), toForeignBusinesses)
+import App.UI (renderPageToString, renderApiError, renderBusinesses)
 
 getBusinessesFromSearch :: Foreign -> Foreign
 getBusinessesFromSearch fSearchResponse =
@@ -16,6 +16,13 @@ getBusinessesFromSearch fSearchResponse =
     Left err -> toForeign { error: show err }
     Right (SearchResponse { businesses = businesses }) ->
       toForeignBusinesses businesses
+
+renderErrorPageToHtml :: Foreign -> String
+renderErrorPageToHtml fErrorResponse =
+  case read fErrorResponse :: Either ForeignError ErrorResponse of
+    Left err -> show err
+    Right (ErrorResponse { error = error }) ->
+      renderPageToString (renderApiError error)
 
 renderHomePageToHtml :: Foreign -> String
 renderHomePageToHtml fSearchResponse =

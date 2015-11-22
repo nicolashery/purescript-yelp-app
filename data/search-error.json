@@ -1,0 +1,6 @@
+{
+  "error": {
+    "name": "YelpError",
+    "message": "MISSING_PARAMETER One or more parameters are missing in request"
+  }
+}

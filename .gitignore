@@ -4,3 +4,4 @@
 /.psci*
 /src/.webpack.js
 /tmp/
+/.env

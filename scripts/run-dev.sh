@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 source $PWD/scripts/_env.sh
-nodemon -w output --exec node app.js
+nodemon -w js -w output --exec node js/server.js
