@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 
 source $PWD/scripts/_env.sh
-pulp -w build & webpack -w
+# Build first so Webpack can resolve requires
+pulp build --src-path src/purs
+# Launch watch processes in parallel
+pulp -w build --src-path src/purs & webpack -w
