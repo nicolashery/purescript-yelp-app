@@ -24,6 +24,7 @@ renderPageToString content =
         H.body $ do
           renderPoweredByYelp
           content
+          H.script ! A.src "bundle.js" $ text ""
   in render markup
 
 renderPoweredByYelp :: Markup

@@ -1,5 +1,4 @@
--- Module used for interfacing with JS-land
-module App where
+module App.Server.Main where
 
 import Prelude
 

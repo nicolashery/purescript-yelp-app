@@ -6,7 +6,7 @@ var YelpClient = require("./server/yelp-client");
 // PureScript modules
 // Make sure to run with:
 // NODE_PATH=$PWD/output:$NODE_PATH node app.js
-var App = require("App");
+var Main = require("App.Server.Main");
 
 var DEV_SEARCH_RESPONSE = require("../data/search.json");
 var DEV_SEARCH_ERROR_RESPONSE = require("../data/search-error.json");
@@ -16,7 +16,8 @@ var app = express();
 var PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
+app.use(express.static("dist"));
 
 function handleYelpError(res, err) {
   var result = {
@@ -40,15 +41,15 @@ app.get("/api/search", function(req, res) {
 
 app.get("/", function(req, res) {
   // Uncomment one of these for development
-  // return res.send(App.renderErrorPageToHtml(DEV_SEARCH_ERROR_RESPONSE));
-  // return res.send(App.renderHomePageToHtml(DEV_SEARCH_RESPONSE));
+  // return res.send(Main.renderErrorPageToHtml(DEV_SEARCH_ERROR_RESPONSE));
+  // return res.send(Main.renderHomePageToHtml(DEV_SEARCH_RESPONSE));
 
   YelpClient.search(req.query, function(err, data) {
     var html = "";
     if (err) {
-      html = App.renderErrorPageToHtml({error: err});
+      html = Main.renderErrorPageToHtml({error: err});
     } else {
-      html = App.renderHomePageToHtml(data);
+      html = Main.renderHomePageToHtml(data);
     }
 
     res.send(html);
