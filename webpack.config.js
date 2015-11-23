@@ -1,6 +1,15 @@
+var fs = require("fs");
 var path = require("path");
 
 var IS_PROD = process.env.NODE_ENV === "production";
+
+function prodPureScriptExternals() {
+  var moduleNames = fs.readdirSync(path.join(__dirname, "output"));
+  return moduleNames.reduce(function(result, moduleName) {
+    result[moduleName] = "PS[\"" + moduleName + "\"]";
+    return result;
+  }, {});
+}
 
 module.exports = {
   entry: "./js/client.js",
@@ -15,7 +24,5 @@ module.exports = {
       "output"
     ]
   },
-  externals: IS_PROD ? {
-    "App.Client.Main": "PS[\"App.Client.Main\"]"
-  } : null
+  externals: IS_PROD ? prodPureScriptExternals() : null
 };
