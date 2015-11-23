@@ -4,6 +4,7 @@ source $PWD/scripts/_env.sh
 # Build server PureScript
 pulp build
 # Build client PureScript with dead code elimination
+mkdir -p dist
 pulp build -O --main App.Client.Main --to dist/purescript-bundle.js
 # Build client JavaScript with production config
 NODE_ENV=production webpack
