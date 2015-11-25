@@ -1,6 +1,20 @@
 body {
-  max-width: 560px;
+  max-width: 720px;
   margin: 20px auto;
+}
+
+input[type=text] {
+  color: #0a0a0a;
+}
+
+.search-form .button {
+  margin-top: 1rem;
+}
+
+@media screen and (min-width: 40em) {
+  .search-form .button {
+    margin-top: 1.475rem;
+  }
 }
 
 .powered-by-yelp {

@@ -19,6 +19,13 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(express.static("dist"));
 
+function getSearchQuery(req) {
+  return {
+    term: req.query.term || "",
+    location: req.query.location || ""
+  };
+}
+
 function handleYelpError(res, err) {
   var result = {
     error: {
@@ -30,26 +37,29 @@ function handleYelpError(res, err) {
 }
 
 app.get("/api/search", function(req, res) {
-  YelpClient.search(req.query, function(err, data) {
+  var query = getSearchQuery(req);
+  YelpClient.search(query, function(err, results) {
     if (err) {
       return handleYelpError(res, err);
     }
 
-    res.send(data);
+    res.send(results);
   });
 });
 
-app.get("/", function(req, res) {
-  // Uncomment one of these for development
-  // return res.send(Main.renderErrorPageToHtml(DEV_SEARCH_ERROR_RESPONSE));
-  // return res.send(Main.renderHomePageToHtml(DEV_SEARCH_RESPONSE));
+app.use("/", function(req, res) {
+  var query = getSearchQuery(req);
 
-  YelpClient.search(req.query, function(err, data) {
+  // Uncomment one of these for development
+  // return res.send(Main.renderSearchPageError(query, DEV_SEARCH_ERROR_RESPONSE));
+  // return res.send(Main.renderSearchPageResults(query, DEV_SEARCH_RESPONSE));
+
+  YelpClient.search(query, function(err, results) {
     var html = "";
     if (err) {
-      html = Main.renderErrorPageToHtml({error: err});
+      html = Main.renderSearchPageError(query, {error: err});
     } else {
-      html = Main.renderHomePageToHtml(data);
+      html = Main.renderSearchPageResults(query, results);
     }
 
     res.send(html);

@@ -29,6 +29,11 @@ newtype Business = Business {
   categories :: Maybe (Array (Tuple String String))
 }
 
+newtype SearchQuery = SearchQuery {
+  term :: String,
+  location :: String
+}
+
 newtype ApiError = ApiError {
   name :: String,
   message :: String
@@ -59,7 +64,17 @@ instance showBusiness :: Show Business where
   show = gShow
 
 instance businessIsForeign :: IsForeign Business where
-  read = readGeneric defaultOptions
+  read = readGeneric opts
+
+-- SearchQuery
+
+derive instance genericSearchQuery :: Generic SearchQuery
+
+instance showSearchQuery :: Show SearchQuery where
+  show = gShow
+
+instance searchQueryIsForeign :: IsForeign SearchQuery where
+  read = readGeneric opts
 
 -- ApiError
 
