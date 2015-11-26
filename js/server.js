@@ -55,6 +55,11 @@ app.use("/", function(req, res) {
   // return res.send(Main.renderSearchPageResults(query, DEV_SEARCH_RESPONSE));
   // return res.send(Main.renderSearchPageError(query, DEV_SEARCH_ERROR_RESPONSE));
   // return res.send(Main.renderSearchPageResults(query, DEV_SEARCH_EMPTY_RESPONSE));
+  // return res.send(Main.renderSearchPageWelcome());
+
+  if (!query.location.length) {
+    return res.send(Main.renderSearchPageWelcome());
+  }
 
   YelpClient.search(query, function(err, results) {
     var html = "";

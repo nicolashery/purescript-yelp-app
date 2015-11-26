@@ -55,6 +55,11 @@ renderSearchForm (SearchQuery { term = term, location = location }) =
         H.button ! A.type' "submit" ! A.className "expanded button" $
           text "Search"
 
+renderWelcomeMessage :: Markup
+renderWelcomeMessage =
+  H.div ! A.className "column row" $
+    text "Search for bars, restaurants, etc. in your city."
+
 renderError :: forall a. (Show a) => a -> Markup
 renderError error =
   H.div ! A.className "alert callout" $ do

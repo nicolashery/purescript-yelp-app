@@ -5,7 +5,7 @@ import Prelude
 import Data.Either (Either(..))
 import Data.Foreign (Foreign(), ForeignError(), toForeign)
 import Data.Foreign.Class (read)
-import Data.Function (Fn2(), mkFn2)
+import Data.Function (Fn0(), mkFn0, Fn2(), mkFn2)
 
 import App.Model
   ( SearchQuery(..)
@@ -13,7 +13,13 @@ import App.Model
   , SearchResponse(..)
   , toForeignBusinesses
   )
-import App.UI (renderSearchPageToString, renderError, renderApiError, renderResults)
+import App.UI
+  ( renderSearchPageToString
+  , renderError
+  , renderApiError
+  , renderResults
+  , renderWelcomeMessage
+  )
 
 getBusinessesFromSearch :: Foreign -> Foreign
 getBusinessesFromSearch fSearchResponse =
@@ -48,3 +54,6 @@ renderSearchPageResults = mkFn2 $ \fQuery fSearchResponse ->
           renderResults query results
   in renderSearchPageToString query content
 
+renderSearchPageWelcome :: Fn0 String
+renderSearchPageWelcome = mkFn0 $ \_ ->
+  renderSearchPageToString emptySearchQuery renderWelcomeMessage
