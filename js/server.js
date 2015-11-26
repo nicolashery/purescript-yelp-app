@@ -10,6 +10,7 @@ var Main = require("App.Server.Main");
 
 var DEV_SEARCH_RESPONSE = require("../data/search.json");
 var DEV_SEARCH_ERROR_RESPONSE = require("../data/search-error.json");
+var DEV_SEARCH_EMPTY_RESPONSE = require("../data/search-empty.json");
 
 var app = express();
 
@@ -51,8 +52,9 @@ app.use("/", function(req, res) {
   var query = getSearchQuery(req);
 
   // Uncomment one of these for development
-  // return res.send(Main.renderSearchPageError(query, DEV_SEARCH_ERROR_RESPONSE));
   // return res.send(Main.renderSearchPageResults(query, DEV_SEARCH_RESPONSE));
+  // return res.send(Main.renderSearchPageError(query, DEV_SEARCH_ERROR_RESPONSE));
+  // return res.send(Main.renderSearchPageResults(query, DEV_SEARCH_EMPTY_RESPONSE));
 
   YelpClient.search(query, function(err, results) {
     var html = "";

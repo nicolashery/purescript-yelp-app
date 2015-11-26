@@ -65,6 +65,19 @@ renderApiError :: ApiError -> Markup
 renderApiError (ApiError { name = name, message = message }) =
   renderError ("(" ++ name ++ ") " ++ message)
 
+renderResults :: SearchQuery ->  Array Business -> Markup
+renderResults query [] = renderNoResults query
+renderResults _ businesses = renderBusinesses businesses
+
+renderNoResults :: SearchQuery -> Markup
+renderNoResults (SearchQuery { term = term, location = location }) =
+  H.div ! A.className "column row" $ do
+    text "We couldn't find and results for "
+    H.strong $ text term
+    text " near "
+    H.strong $ text location
+    text "."
+
 renderBusinesses :: Array Business -> Markup
 renderBusinesses businesses =
   H.ul ! A.className "business-list" $ traverse_ renderBusiness businesses

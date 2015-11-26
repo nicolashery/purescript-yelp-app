@@ -13,7 +13,7 @@ import App.Model
   , SearchResponse(..)
   , toForeignBusinesses
   )
-import App.UI (renderSearchPageToString, renderError, renderApiError, renderBusinesses)
+import App.UI (renderSearchPageToString, renderError, renderApiError, renderResults)
 
 getBusinessesFromSearch :: Foreign -> Foreign
 getBusinessesFromSearch fSearchResponse =
@@ -44,7 +44,7 @@ renderSearchPageResults = mkFn2 $ \fQuery fSearchResponse ->
   let query = readSearchQueryOrEmtpy fQuery
       content = case read fSearchResponse :: Either ForeignError SearchResponse of
         Left err -> renderError err
-        Right (SearchResponse { businesses = businesses }) ->
-          renderBusinesses businesses
+        Right (SearchResponse { businesses = results }) ->
+          renderResults query results
   in renderSearchPageToString query content
 
