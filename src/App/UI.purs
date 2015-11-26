@@ -84,4 +84,5 @@ renderBusinesses businesses =
 
 renderBusiness :: Business -> Markup
 renderBusiness (Business { name = name }) =
-  H.li ! A.className "business column row" $ text name
+  H.li ! A.className "column row" $
+    H.div ! A.className "business" $ text name
