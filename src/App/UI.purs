@@ -31,6 +31,7 @@ renderSearchPageToString query content =
   let body = H.div $ do
         renderPoweredByYelp
         renderSearchForm query
+        renderSpinner
         content
   in renderPageToString body
 
@@ -52,7 +53,7 @@ renderSearchForm (SearchQuery { term = term, location = location }) =
           text "Near"
           H.input ! A.type' "text" ! A.name "location" ! A.value location
       H.div ! A.className "medium-4 columns" $ do
-        H.button ! A.type' "submit" ! A.className "expanded button" $
+        H.button ! A.type' "submit" ! A.className "search-button expanded button" $
           text "Search"
 
 renderWelcomeMessage :: Markup
@@ -91,3 +92,19 @@ renderBusiness :: Business -> Markup
 renderBusiness (Business { name = name }) =
   H.li ! A.className "column row" $
     H.div ! A.className "business" $ text name
+
+renderSpinner :: Markup
+renderSpinner =
+  H.div ! A.className "spinner sk-fading-circle" $ do
+    H.div ! A.className "sk-circle1 sk-circle" $ text ""
+    H.div ! A.className "sk-circle2 sk-circle" $ text ""
+    H.div ! A.className "sk-circle3 sk-circle" $ text ""
+    H.div ! A.className "sk-circle4 sk-circle" $ text ""
+    H.div ! A.className "sk-circle5 sk-circle" $ text ""
+    H.div ! A.className "sk-circle6 sk-circle" $ text ""
+    H.div ! A.className "sk-circle7 sk-circle" $ text ""
+    H.div ! A.className "sk-circle8 sk-circle" $ text ""
+    H.div ! A.className "sk-circle9 sk-circle" $ text ""
+    H.div ! A.className "sk-circle10 sk-circle" $ text ""
+    H.div ! A.className "sk-circle11 sk-circle" $ text ""
+    H.div ! A.className "sk-circle12 sk-circle" $ text ""
