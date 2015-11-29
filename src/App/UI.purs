@@ -8,7 +8,7 @@ import qualified Text.Smolder.HTML.Attributes as A
 import Text.Smolder.Markup (Markup(), text, (!))
 import Text.Smolder.Renderer.String (render)
 
-import App.Model (SearchQuery(..), ApiError(..), Business(..))
+import App.Model (SearchQuery(..), Business(..))
 
 renderPageToString :: Markup -> String
 renderPageToString body =
@@ -31,8 +31,7 @@ renderSearchPageToString query content =
   let body = H.div $ do
         renderPoweredByYelp
         renderSearchForm query
-        renderSpinner
-        content
+        renderContent content
   in renderPageToString body
 
 renderPoweredByYelp :: Markup
@@ -56,6 +55,10 @@ renderSearchForm (SearchQuery { term = term, location = location }) =
         H.button ! A.type' "submit" ! A.className "search-button expanded button" $
           text "Search"
 
+renderContent :: Markup -> Markup
+renderContent content =
+  H.div ! A.className "content" $ content
+
 renderWelcomeMessage :: Markup
 renderWelcomeMessage =
   H.div ! A.className "column row" $
@@ -63,13 +66,10 @@ renderWelcomeMessage =
 
 renderError :: forall a. (Show a) => a -> Markup
 renderError error =
-  H.div ! A.className "alert callout" $ do
-    H.p $ text "Oops! Something went wrong."
-    H.p $ text (show error)
-
-renderApiError :: ApiError -> Markup
-renderApiError (ApiError { name = name, message = message }) =
-  renderError ("(" ++ name ++ ") " ++ message)
+  H.div ! A.className "column row" $
+    H.div ! A.className "alert callout" $ do
+      H.p $ text "Oops! Something went wrong."
+      H.p $ text (show error)
 
 renderResults :: SearchQuery ->  Array Business -> Markup
 renderResults query [] = renderNoResults query
@@ -95,7 +95,7 @@ renderBusiness (Business { name = name }) =
 
 renderSpinner :: Markup
 renderSpinner =
-  H.div ! A.className "spinner sk-fading-circle" $ do
+  H.div ! A.className "sk-fading-circle" $ do
     H.div ! A.className "sk-circle1 sk-circle" $ text ""
     H.div ! A.className "sk-circle2 sk-circle" $ text ""
     H.div ! A.className "sk-circle3 sk-circle" $ text ""

@@ -47,12 +47,6 @@ newtype SearchResponse = SearchResponse {
   businesses :: Array Business
 }
 
--- Functions
--------------------------------------------------------------------------------
-
-toForeignBusinesses :: Array Business -> Foreign
-toForeignBusinesses businesses = toForeignGeneric opts businesses
-
 -- Instances
 -------------------------------------------------------------------------------
 

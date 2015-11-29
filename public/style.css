@@ -25,10 +25,6 @@ input[type=text] {
   }
 }
 
-.spinner {
-  display: none;
-}
-
 .business-list {
   list-style: none;
   margin: 0;
