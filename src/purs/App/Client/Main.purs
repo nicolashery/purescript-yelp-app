@@ -6,7 +6,8 @@ import Control.Monad.Aff (Aff(), runAff)
 import Control.Monad.Eff (Eff())
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (CONSOLE(), log)
-import Control.Monad.Eff.Exception (Error())
+import Control.Monad.Eff.Exception (Error(), error, message)
+import Control.Monad.Error.Class (throwError)
 import Data.DOM.Simple.Element
   ( querySelector
   , setStyleAttr
@@ -90,29 +91,26 @@ showSpinner = do
   Just content <- querySelector ".content" doc
   setInnerHTML (render $ renderSpinner) content
 
-search :: forall eff. SearchQuery -> Aff (ajax :: AJAX | eff) (Either String (Array Business))
+search :: forall eff. SearchQuery -> Aff (ajax :: AJAX | eff) (Array Business)
 search (SearchQuery { term = term, location = location }) = do
   let qs = "?term=" ++ encodeURIComponent term ++ "&location=" ++ encodeURIComponent location
   let url = "/api/search" ++ qs
   res <- affjax $ defaultRequest { url = url, method = GET }
-  return if res.status /= StatusCode 200
-          then case readJSON res.response :: Either ForeignError ErrorResponse of
-            Left err -> Left (show err)
-            Right (ErrorResponse { error = err }) -> Left (show err)
-          else case readJSON res.response :: Either ForeignError SearchResponse of
-            Left err -> Left (show err)
-            Right (SearchResponse { businesses = businesses }) -> Right businesses
+  if res.status /= StatusCode 200
+    then case readJSON res.response :: Either ForeignError ErrorResponse of
+      Left err -> throwError (error (show err))
+      Right (ErrorResponse { error = err }) -> throwError (error (show err))
+    else case readJSON res.response :: Either ForeignError SearchResponse of
+      Left err -> throwError (error (show err))
+      Right (SearchResponse { businesses = businesses }) -> return businesses
 
 handleSearchError :: forall eff. Error -> Eff (dom :: DOM | eff) Unit
 handleSearchError err = do
-  showError err
+  showError (message err)
   enableForm
 
-handleSearchSuccess :: forall eff. SearchQuery -> Either String (Array Business) -> Eff (dom :: DOM | eff) Unit
-handleSearchSuccess _ (Left err) = do
-  showError err
-  enableForm
-handleSearchSuccess query (Right businesses) = do
+handleSearchSuccess :: forall eff. SearchQuery -> Array Business -> Eff (dom :: DOM | eff) Unit
+handleSearchSuccess query businesses = do
   showResults query businesses
   enableForm
 
