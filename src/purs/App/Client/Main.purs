@@ -4,13 +4,10 @@ import Prelude
 
 import Control.Monad.Aff (Aff(), runAff)
 import Control.Monad.Eff (Eff())
-import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Console (CONSOLE(), log)
 import Control.Monad.Eff.Exception (Error(), error, message)
 import Control.Monad.Error.Class (throwError)
 import Data.DOM.Simple.Element
   ( querySelector
-  , setStyleAttr
   , setAttribute
   , removeAttribute
   , classAdd
