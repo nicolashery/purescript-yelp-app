@@ -12,7 +12,7 @@ function prodPureScriptExternals() {
 }
 
 module.exports = {
-  entry: "./js/client.js",
+  entry: "./src/js/client.js",
   devtool: IS_PROD ? null : "source-maps",
   output: {
     path: path.join(__dirname, "dist"),

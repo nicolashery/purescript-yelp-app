@@ -8,9 +8,9 @@ var YelpClient = require("./server/yelp-client");
 // NODE_PATH=$PWD/output:$NODE_PATH node app.js
 var Main = require("App.Server.Main");
 
-var DEV_SEARCH_RESPONSE = require("../data/search.json");
-var DEV_SEARCH_ERROR_RESPONSE = require("../data/search-error.json");
-var DEV_SEARCH_EMPTY_RESPONSE = require("../data/search-empty.json");
+var DEV_SEARCH_RESPONSE = require("../../data/search.json");
+var DEV_SEARCH_ERROR_RESPONSE = require("../../data/search-error.json");
+var DEV_SEARCH_EMPTY_RESPONSE = require("../../data/search-empty.json");
 
 var app = express();
 

@@ -22,6 +22,7 @@
     "webpack": "1.12.8"
   },
   "devDependencies": {
-    "nodemon": "1.8.1"
+    "nodemon": "1.8.1",
+    "parallelshell": "2.0.0"
   }
 }
