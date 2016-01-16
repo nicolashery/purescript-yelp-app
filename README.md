@@ -4,7 +4,7 @@ Small app built with PureScript, Node.js, and the Yelp API.
 
 ## Quickstart
 
-Make sure you have [PureScript](http://www.purescript.org/) and [Pulp](https://github.com/bodil/pulp) installed.
+Make sure you have [PureScript](http://www.purescript.org/), [Pulp](https://github.com/bodil/pulp), and [Bower](http://bower.io/) installed.
 
 Clone this repository and install dependencies with:
 
