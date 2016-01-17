@@ -14,3 +14,15 @@ exports.extractQueryString = function(url) {
     return "?" + parts[1];
   }
 };
+
+exports.unsafeQuerySelector = function(selector) {
+  return function(src) {
+    return function() {
+      var el = src.querySelector(selector);
+      if (!el) {
+        throw new Error("Could not find element for selector '" + selector + "'");
+      }
+      return el;
+    };
+  };
+};

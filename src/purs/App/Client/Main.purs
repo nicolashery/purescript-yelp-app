@@ -4,11 +4,10 @@ import Prelude
 
 import Control.Monad.Aff (Aff(), runAff)
 import Control.Monad.Eff (Eff())
-import Control.Monad.Eff.Exception (Error(), error, message)
+import Control.Monad.Eff.Exception (EXCEPTION(), Error(), error, message)
 import Control.Monad.Error.Class (throwError)
 import Data.DOM.Simple.Element
-  ( querySelector
-  , setAttribute
+  ( setAttribute
   , removeAttribute
   , classAdd
   , classRemove
@@ -25,7 +24,6 @@ import qualified Data.DOM.Simple.Window as W
 import Data.Either (Either(..))
 import Data.Foreign (ForeignError())
 import Data.Foreign.Class (readJSON)
-import Data.Maybe (Maybe(..))
 import DOM (DOM())
 import Network.HTTP.Affjax (AJAX(), affjax, defaultRequest)
 import Network.HTTP.Method (Method(GET))
@@ -41,29 +39,29 @@ import App.Model
   , urlParseSearchQuery
   )
 import App.UI (renderSpinner, renderError, renderResults)
-import App.Utils (extractQueryString)
+import App.Utils (extractQueryString, unsafeQuerySelector)
 import qualified App.Client.Router as Router
 
-start :: forall eff. Eff (ajax :: AJAX, dom :: DOM | eff) Unit
+start :: forall eff. Eff (exception :: EXCEPTION, ajax :: AJAX, dom :: DOM | eff) Unit
 start = do
   attachEventListeners
   Router.start
 
-attachEventListeners :: forall eff. Eff (ajax :: AJAX, dom :: DOM | eff) Unit
+attachEventListeners :: forall eff. Eff (exception :: EXCEPTION, ajax :: AJAX, dom :: DOM | eff) Unit
 attachEventListeners = do
   doc <- W.document W.globalWindow
-  Just button <- querySelector ".search-button" doc
+  button <- unsafeQuerySelector ".search-button" doc
   addMouseEventListener MouseClickEvent handleClickSearch button
   Router.addUrlChangeListener handleUrlChange
 
-handleClickSearch :: forall eff. DOMEvent -> Eff (dom :: DOM | eff) Unit
+handleClickSearch :: forall eff. DOMEvent -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 handleClickSearch e = do
   preventDefault e
   query <- getFormValues
   let qs = urlStringifySearchQuery query
   Router.navigate ("/" ++ qs)
 
-handleUrlChange :: forall eff. String -> Eff (ajax :: AJAX, dom :: DOM | eff) Unit
+handleUrlChange :: forall eff. String -> Eff (exception :: EXCEPTION, ajax :: AJAX, dom :: DOM | eff) Unit
 handleUrlChange url = do
   disableForm
   showSpinner
@@ -71,41 +69,41 @@ handleUrlChange url = do
   setFormValues query
   runAff handleSearchError (handleSearchSuccess query) (searchBusinesses query)
 
-getFormValues :: forall eff. Eff (dom:: DOM | eff) SearchQuery
+getFormValues :: forall eff. Eff (exception :: EXCEPTION, dom:: DOM | eff) SearchQuery
 getFormValues = do
   doc <- W.document W.globalWindow
-  Just termInput <- querySelector "input[name=term]" doc
+  termInput <- unsafeQuerySelector "input[name=term]" doc
   term <- value termInput
-  Just locationInput <- querySelector "input[name=location]" doc
+  locationInput <- unsafeQuerySelector "input[name=location]" doc
   location <- value locationInput
   return (SearchQuery { term: term, location: location })
 
-setFormValues :: forall eff. SearchQuery -> Eff (dom :: DOM | eff) Unit
+setFormValues :: forall eff. SearchQuery -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 setFormValues (SearchQuery { term, location }) = do
   doc <- W.document W.globalWindow
-  Just termInput <- querySelector "input[name=term]" doc
+  termInput <- unsafeQuerySelector "input[name=term]" doc
   setAttribute "value" term termInput
-  Just locationInput <- querySelector "input[name=location]" doc
+  locationInput <- unsafeQuerySelector "input[name=location]" doc
   setAttribute "value" location locationInput
 
-disableForm :: forall eff. Eff (dom:: DOM | eff) Unit
+disableForm :: forall eff. Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 disableForm = do
   doc <- W.document W.globalWindow
-  Just button <- querySelector ".search-button" doc
+  button <- unsafeQuerySelector ".search-button" doc
   setAttribute "disabled" "" button
   classAdd "disabled" button
 
-enableForm :: forall eff. Eff (dom:: DOM | eff) Unit
+enableForm :: forall eff. Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 enableForm = do
   doc <- W.document W.globalWindow
-  Just button <- querySelector ".search-button" doc
+  button <- unsafeQuerySelector ".search-button" doc
   removeAttribute "disabled" button
   classRemove "disabled" button
 
-showSpinner :: forall eff. Eff (dom:: DOM | eff) Unit
+showSpinner :: forall eff. Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 showSpinner = do
   doc <- W.document W.globalWindow
-  Just content <- querySelector ".content" doc
+  content <- unsafeQuerySelector ".content" doc
   setInnerHTML (render $ renderSpinner) content
 
 searchBusinesses :: forall eff. SearchQuery -> Aff (ajax :: AJAX | eff) (Array Business)
@@ -121,26 +119,26 @@ searchBusinesses query = do
       Left err -> throwError (error (show err))
       Right (SearchResponse { businesses = businesses }) -> return businesses
 
-handleSearchError :: forall eff. Error -> Eff (dom :: DOM | eff) Unit
+handleSearchError :: forall eff. Error -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 handleSearchError err = do
   showError (message err)
   enableForm
 
-handleSearchSuccess :: forall eff. SearchQuery -> Array Business -> Eff (dom :: DOM | eff) Unit
+handleSearchSuccess :: forall eff. SearchQuery -> Array Business -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 handleSearchSuccess query businesses = do
   showResults query businesses
   enableForm
 
-showError :: forall a eff. (Show a) => a -> Eff (dom :: DOM | eff) Unit
+showError :: forall a eff. (Show a) => a -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 showError err = do
   doc <- W.document W.globalWindow
-  Just content <- querySelector ".content" doc
+  content <- unsafeQuerySelector ".content" doc
   setInnerHTML (render $ renderError err) content
 
-showResults :: forall eff. SearchQuery -> Array Business -> Eff (dom :: DOM | eff) Unit
+showResults :: forall eff. SearchQuery -> Array Business -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 showResults query results = do
   doc <- W.document W.globalWindow
-  Just content <- querySelector ".content" doc
+  content <- unsafeQuerySelector ".content" doc
   setInnerHTML (render $ renderResults query results) content
 
 -- Dummy function because psc-bundle needs to call something
