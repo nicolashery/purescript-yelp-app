@@ -23,6 +23,6 @@
   },
   "resolutions": {
     "purescript-strings": "^0.7.0",
-    "purescript-maps": "~0.5.2"
+    "purescript-maps": "~0.5.4"
   }
 }

@@ -37,27 +37,39 @@ import App.Model
   , ErrorResponse(..)
   , SearchResponse(..)
   , Business()
+  , urlStringifySearchQuery
+  , urlParseSearchQuery
   )
 import App.UI (renderSpinner, renderError, renderResults)
-import App.Utils (encodeURIComponent)
+import App.Utils (extractQueryString)
+import qualified App.Client.Router as Router
 
-start :: forall eff. Eff (dom :: DOM | eff) Unit
+start :: forall eff. Eff (ajax :: AJAX, dom :: DOM | eff) Unit
 start = do
   attachEventListeners
+  Router.start
 
-attachEventListeners :: forall eff. Eff (dom :: DOM | eff) Unit
+attachEventListeners :: forall eff. Eff (ajax :: AJAX, dom :: DOM | eff) Unit
 attachEventListeners = do
   doc <- W.document W.globalWindow
   Just button <- querySelector ".search-button" doc
   addMouseEventListener MouseClickEvent handleClickSearch button
+  Router.addUrlChangeListener handleUrlChange
 
-handleClickSearch :: forall eff. DOMEvent -> Eff (ajax :: AJAX, dom :: DOM | eff) Unit
+handleClickSearch :: forall eff. DOMEvent -> Eff (dom :: DOM | eff) Unit
 handleClickSearch e = do
   preventDefault e
+  query <- getFormValues
+  let qs = urlStringifySearchQuery query
+  Router.navigate ("/" ++ qs)
+
+handleUrlChange :: forall eff. String -> Eff (ajax :: AJAX, dom :: DOM | eff) Unit
+handleUrlChange url = do
   disableForm
   showSpinner
-  query <- getFormValues
-  runAff handleSearchError (handleSearchSuccess query) (search query)
+  let query = urlParseSearchQuery (extractQueryString url)
+  setFormValues query
+  runAff handleSearchError (handleSearchSuccess query) (searchBusinesses query)
 
 getFormValues :: forall eff. Eff (dom:: DOM | eff) SearchQuery
 getFormValues = do
@@ -67,6 +79,14 @@ getFormValues = do
   Just locationInput <- querySelector "input[name=location]" doc
   location <- value locationInput
   return (SearchQuery { term: term, location: location })
+
+setFormValues :: forall eff. SearchQuery -> Eff (dom :: DOM | eff) Unit
+setFormValues (SearchQuery { term, location }) = do
+  doc <- W.document W.globalWindow
+  Just termInput <- querySelector "input[name=term]" doc
+  setAttribute "value" term termInput
+  Just locationInput <- querySelector "input[name=location]" doc
+  setAttribute "value" location locationInput
 
 disableForm :: forall eff. Eff (dom:: DOM | eff) Unit
 disableForm = do
@@ -88,9 +108,9 @@ showSpinner = do
   Just content <- querySelector ".content" doc
   setInnerHTML (render $ renderSpinner) content
 
-search :: forall eff. SearchQuery -> Aff (ajax :: AJAX | eff) (Array Business)
-search (SearchQuery { term = term, location = location }) = do
-  let qs = "?term=" ++ encodeURIComponent term ++ "&location=" ++ encodeURIComponent location
+searchBusinesses :: forall eff. SearchQuery -> Aff (ajax :: AJAX | eff) (Array Business)
+searchBusinesses query = do
+  let qs = urlStringifySearchQuery query
   let url = "/api/search" ++ qs
   res <- affjax $ defaultRequest { url = url, method = GET }
   if res.status /= StatusCode 200

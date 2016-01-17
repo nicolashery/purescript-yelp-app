@@ -2,18 +2,18 @@ module App.Model where
 
 import Prelude
 
-import Data.Foreign (Foreign())
 import Data.Foreign.Class (IsForeign)
 import Data.Foreign.Generic
   ( Options()
   , defaultOptions
   , readGeneric
-  , toForeignGeneric
   )
 import Data.Generic (Generic, gShow)
-import Data.Maybe (Maybe())
+import Data.Maybe (Maybe(), fromMaybe)
 import Data.Tuple (Tuple())
+import qualified Data.StrMap as M
 
+import App.Utils (encodeURIComponent, parseQueryString)
 
 opts :: Options
 opts = defaultOptions { unwrapNewtypes = true, tupleAsArray = true }
@@ -46,6 +46,23 @@ newtype ErrorResponse = ErrorResponse {
 newtype SearchResponse = SearchResponse {
   businesses :: Array Business
 }
+
+-- Functions
+-------------------------------------------------------------------------------
+
+emptySearchQuery :: SearchQuery
+emptySearchQuery = SearchQuery { term: "", location: "" }
+
+urlStringifySearchQuery :: SearchQuery -> String
+urlStringifySearchQuery (SearchQuery { term, location }) =
+  "?term=" ++ encodeURIComponent term ++ "&location=" ++ encodeURIComponent location
+
+urlParseSearchQuery :: String -> SearchQuery
+urlParseSearchQuery qs =
+  let queryMap = parseQueryString qs
+      term = fromMaybe "" (M.lookup "term" queryMap)
+      location = fromMaybe "" (M.lookup "location" queryMap)
+  in SearchQuery { term, location }
 
 -- Instances
 -------------------------------------------------------------------------------

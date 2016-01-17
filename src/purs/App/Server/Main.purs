@@ -8,9 +8,10 @@ import Data.Foreign.Class (read)
 import Data.Function (Fn0(), mkFn0, Fn2(), mkFn2)
 
 import App.Model
-  ( SearchQuery(..)
+  ( SearchQuery()
   , ErrorResponse(..)
   , SearchResponse(..)
+  , emptySearchQuery
   )
 import App.UI
   ( renderSearchPageToString
@@ -18,9 +19,6 @@ import App.UI
   , renderResults
   , renderWelcomeMessage
   )
-
-emptySearchQuery :: SearchQuery
-emptySearchQuery = SearchQuery { term: "", location: "" }
 
 readSearchQueryOrEmtpy :: Foreign -> SearchQuery
 readSearchQueryOrEmtpy fQuery =
