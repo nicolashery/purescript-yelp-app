@@ -8,4 +8,6 @@ foreign import navigate :: forall eff. String -> Eff eff Unit
 
 foreign import addUrlChangeListener :: forall eff. (String -> Eff eff Unit) -> Eff eff Unit
 
+foreign import getWindowUrl :: forall eff. Eff eff String
+
 foreign import start :: forall eff. Eff eff Unit

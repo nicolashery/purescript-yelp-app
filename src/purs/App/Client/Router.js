@@ -42,18 +42,18 @@ exports.addUrlChangeListener = function(handler) {
   };
 };
 
+exports.getWindowUrl = function() {
+  var location = window.location;
+  return location.pathname + location.search;
+};
+
 exports.start = function() {
   if (!started && hasHistoryApi) {
     window.addEventListener("popstate", function(e) {
-      var url = getWindowUrl();
+      var url = exports.getWindowUrl();
       onUrlChange(url);
     });
     started = true;
   }
   return {};
-}
-
-function getWindowUrl() {
-  var location = window.location;
-  return location.pathname + location.search;
-}
+};

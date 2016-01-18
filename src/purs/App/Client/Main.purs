@@ -12,6 +12,7 @@ import Data.DOM.Simple.Element
   , classAdd
   , classRemove
   , value
+  , setValue
   , setInnerHTML
   )
 import Data.DOM.Simple.Events
@@ -24,10 +25,12 @@ import qualified Data.DOM.Simple.Window as W
 import Data.Either (Either(..))
 import Data.Foreign (ForeignError())
 import Data.Foreign.Class (readJSON)
+import qualified Data.String as S
 import DOM (DOM())
 import Network.HTTP.Affjax (AJAX(), affjax, defaultRequest)
 import Network.HTTP.Method (Method(GET))
 import Network.HTTP.StatusCode (StatusCode(StatusCode))
+import Text.Smolder.Markup (Markup())
 import Text.Smolder.Renderer.String (render)
 
 import App.Model
@@ -35,10 +38,11 @@ import App.Model
   , ErrorResponse(..)
   , SearchResponse(..)
   , Business()
+  , emptySearchQuery
   , urlStringifySearchQuery
   , urlParseSearchQuery
   )
-import App.UI (renderSpinner, renderError, renderResults)
+import App.UI (renderSpinner, renderError, renderResults, renderWelcomeMessage)
 import App.Utils (extractQueryString, unsafeQuerySelector)
 import qualified App.Client.Router as Router
 
@@ -63,11 +67,17 @@ handleClickSearch e = do
 
 handleUrlChange :: forall eff. String -> Eff (exception :: EXCEPTION, ajax :: AJAX, dom :: DOM | eff) Unit
 handleUrlChange url = do
-  disableForm
-  showSpinner
-  let query = urlParseSearchQuery (extractQueryString url)
-  setFormValues query
-  runAff handleSearchError (handleSearchSuccess query) (searchBusinesses query)
+  let qs = extractQueryString url
+  if S.length qs == 0
+    then do
+      setFormValues emptySearchQuery
+      showWelcome
+    else do
+      disableForm
+      showSpinner
+      let query = urlParseSearchQuery qs
+      setFormValues query
+      runAff handleSearchError (handleSearchSuccess query) (searchBusinesses query)
 
 getFormValues :: forall eff. Eff (exception :: EXCEPTION, dom:: DOM | eff) SearchQuery
 getFormValues = do
@@ -82,9 +92,9 @@ setFormValues :: forall eff. SearchQuery -> Eff (exception :: EXCEPTION, dom :: 
 setFormValues (SearchQuery { term, location }) = do
   doc <- W.document W.globalWindow
   termInput <- unsafeQuerySelector "input[name=term]" doc
-  setAttribute "value" term termInput
+  setValue term termInput
   locationInput <- unsafeQuerySelector "input[name=location]" doc
-  setAttribute "value" location locationInput
+  setValue location locationInput
 
 disableForm :: forall eff. Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
 disableForm = do
@@ -130,16 +140,19 @@ handleSearchSuccess query businesses = do
   enableForm
 
 showError :: forall a eff. (Show a) => a -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
-showError err = do
-  doc <- W.document W.globalWindow
-  content <- unsafeQuerySelector ".content" doc
-  setInnerHTML (render $ renderError err) content
+showError err = setContent (renderError err)
 
 showResults :: forall eff. SearchQuery -> Array Business -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
-showResults query results = do
+showResults query results = setContent (renderResults query results)
+
+showWelcome :: forall eff. Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
+showWelcome = setContent renderWelcomeMessage
+
+setContent :: forall eff. Markup -> Eff (exception :: EXCEPTION, dom :: DOM | eff) Unit
+setContent markup = do
   doc <- W.document W.globalWindow
   content <- unsafeQuerySelector ".content" doc
-  setInnerHTML (render $ renderResults query results) content
+  setInnerHTML (render markup) content
 
 -- Dummy function because psc-bundle needs to call something
 main :: String -> String
